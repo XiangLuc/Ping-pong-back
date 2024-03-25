@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from joueur_routes import joueurs_bp
 from equipe_route import equipes_bp
@@ -7,7 +7,7 @@ from equipement_tournoi_route import equipement_tournoi_bp
 from tournoi_route import tournois_bp
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors = CORS(app)
 
 
 app.register_blueprint(joueurs_bp, url_prefix='/joueurs')

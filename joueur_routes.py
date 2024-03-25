@@ -13,7 +13,7 @@ def get_all_joueurs():
         return jsonify(joueurs_dict)
 
 
-@joueurs_bp.route('/<int:id_joueur>', methods=['GET'])
+@joueurs_bp.route('/<string:id_joueur>', methods=['GET'])
 def get_joueur_by_id(id_joueur):
     with Mongo2Client() as mongo_client:
         db_joueur = mongo_client.db['joueur']
@@ -24,19 +24,19 @@ def get_joueur_by_id(id_joueur):
             return jsonify({'erreur': f"le joueur d'identifiant {id_joueur} n'existe pas."}), 404
 
 
-@joueurs_bp.route('/', methods=['POST'])
+@joueurs_bp.route('/add', methods=['POST'])
 def add_joueur():
     data = request.get_json()
     with Mongo2Client() as mongo_client:
         db_joueur = mongo_client.db['joueur']
         insert_joueur = db_joueur.insert_one(data)
         if insert_joueur:
-            return jsonify({"True": "La requete a bien été insérée"})
+            return jsonify({"message": "La requete a bien été insérée"})
         else:
-            return jsonify({"False": "Erreur lors de l'insertion"}), 404
+            return jsonify({"message": "Erreur lors de l'insertion"}), 404
 
 
-@joueurs_bp.route('/<int:id_joueur>', methods=['DELETE'])
+@joueurs_bp.route('/<string:id_joueur>', methods=['DELETE'])
 def delete_joueur_by_id(id_joueur):
     with Mongo2Client() as mongo_client:
         db_joueur = mongo_client.db['joueur']
@@ -48,7 +48,7 @@ def delete_joueur_by_id(id_joueur):
             return jsonify({'False': 'Erreur lors de la suppression'}), 404
 
 
-@joueurs_bp.route('/<int:id_joueur>', methods=['PUT'])
+@joueurs_bp.route('/<string:id_joueur>', methods=['PUT'])
 def update_joueur_by_id(id_joueur):
     data = request.json
 
