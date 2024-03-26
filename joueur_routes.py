@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from mongo_client import Mongo2Client
+from bson import ObjectId
 
 joueurs_bp = Blueprint('joueur_bp', __name__)
 
@@ -9,16 +10,20 @@ def get_all_joueurs():
     with Mongo2Client() as mongo_client:
         db_joueur = mongo_client.db['joueur']
         joueurs = db_joueur.find()
-        joueurs_dict = [joueur for joueur in joueurs]
-        return jsonify(joueurs_dict)
+        joueurs_list = []
+        for joueur in joueurs:
+            joueur['_id'] = str(joueur['_id'])
+            joueurs_list.append(joueur)
+        return jsonify(joueurs_list)
 
 
 @joueurs_bp.route('/<string:id_joueur>', methods=['GET'])
 def get_joueur_by_id(id_joueur):
     with Mongo2Client() as mongo_client:
         db_joueur = mongo_client.db['joueur']
-        joueur = db_joueur.find_one({'_id': id_joueur})
+        joueur = db_joueur.find_one({'_id': ObjectId(id_joueur)})
         if joueur:
+            joueur['_id'] = str(joueur['_id'])
             return jsonify(joueur)
         else:
             return jsonify({'erreur': f"le joueur d'identifiant {id_joueur} n'existe pas."}), 404
@@ -40,7 +45,7 @@ def add_joueur():
 def delete_joueur_by_id(id_joueur):
     with Mongo2Client() as mongo_client:
         db_joueur = mongo_client.db['joueur']
-        delete_joueur = db_joueur.delete_one({'_id': id_joueur})
+        delete_joueur = db_joueur.delete_one({'_id': ObjectId(id_joueur)})
 
         if delete_joueur:
             return jsonify({"True": "La suppression a bien été réalisée."})
@@ -54,7 +59,7 @@ def update_joueur_by_id(id_joueur):
 
     with Mongo2Client() as mongo_client:
         db_joueur = mongo_client.db['joueur']
-        update_joueur = db_joueur.update_one({'_id': id_joueur}, {'$set': data})
+        update_joueur = db_joueur.update_one({'_id': ObjectId(id_joueur)}, {'$set': data})
 
         if update_joueur.modified_count > 0:
             return jsonify({"True": "La mise à jour a bien été réalisée."})
